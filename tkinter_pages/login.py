@@ -16,9 +16,6 @@ class LoginPage:
     FONT = ("Segoe UI", 12)
     TITLE_FONT = ("Segoe UI", 40, "bold")
 
-
-    
-
     
     def __init__(self, root):
 
@@ -103,18 +100,14 @@ class LoginPage:
         password = self.password_entry.get()
         
             
-        role = self.auth.login(
-            username,
-            password
-            )
+        role = self.auth.login(username, password)
             
         if role:
             self.login_frame.destroy()
-            AdminPage(self.root, role)
+            AdminPage(self.root, role, self.show_login_page)
         else:
             messagebox.showerror
-            ("Login failed",
-             "Invalid Credentials")
+            ("Login failed", "Invalid Credentials")
             self.password_entry.delete(0, tk.END)
             self.password_entry.focus()
         
@@ -122,3 +115,9 @@ class LoginPage:
         self.login_frame.destroy()
         
         RegisterPage(self.root)
+        
+    def show_login_page(self):
+        for widget in self.root.winfo_children():
+                widget.destroy()
+            
+        self.create_widgets()

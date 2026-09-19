@@ -25,12 +25,13 @@ class AdminPage:
     TITLE_FONT = ("Segoe UI", 40, "bold")
 
 
-    def __init__(self, root, role):
+    def __init__(self, root, role, show_login_callback):
         
         self.menu_centered = True
         self.animation_running = False
         self.root = root
         self.role = role
+        self.show_login_callback = show_login_callback
         self.auth = AuthService()
         
 
@@ -57,9 +58,7 @@ class AdminPage:
         
         self.root.bind("<Configure>", self.on_resize)
         self.root.update_idletasks()
-        
-        
-        
+
         
     def create_widgets(self):
         self.body_frame()
@@ -97,6 +96,18 @@ class AdminPage:
 
         self.admin_frame.pack(fill="both", expand=True)
 
+        self.back_button = tk.Button(
+                                    self.admin_frame,
+                                    text = "Back",
+                                    command = self.go_back,
+                                    cursor = "hand2",
+                                    bg = self.TEXT_COLOR_BEIGE
+                                    )
+
+        self.back_button.place(x=10, y=10)
+        self.back_button.lift()
+        
+        
         self.menu_frame = tk.Frame(
                                     self.admin_frame,
                                     bg=self.BACKGROUND_COLOR_BROWN
@@ -407,8 +418,13 @@ class AdminPage:
         for button in buttons:
             self.add_hover(button)
         
+    def open_add_products(self, content_frame):
+        AddProducts(content_frame)
 
-        
+    def go_back(self):
+        self.root.unbind("<Configure>")
+        self.show_login_callback()
+    
     def load_dashboard(self):
         if self.role == "consumer":
             print("consumer dashboard")

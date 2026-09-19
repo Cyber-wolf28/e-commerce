@@ -137,4 +137,45 @@ class DataBase:
             if connection:
                 connection.close()
            
-    
+    @staticmethod
+    def update_product(product_id, column_name, new_value):
+        
+        allowed_columns = {
+            "Fruit": "fruit",
+            "Price": "price",
+            "Stock":  "stock"
+        }
+        
+        if column_name not in allowed_columns:
+            return False
+        
+        database_column = allowed_columns[column_name]
+        
+        conn = DataBase.get_connection()
+        
+        try:
+            cursor = conn.cursor()
+            
+            query = f"""
+                    UPDATE fruits
+                    SET {database_column} = %s
+                    WHERE id = %s
+                    """
+                    
+            cursor.execute(
+                query,
+                (new_value, product_id)
+            )
+            
+            conn.commit()
+            
+            return True
+        
+        except Exception as error:
+            conn.rollback()
+            print("Database error:", error)
+            return False
+        
+        finally:
+            cursor.close()
+            conn.close()

@@ -22,7 +22,9 @@ class ViewProducts:
     def __init__(self, content_frame):
         self.content_frame = content_frame
         self.db = DataBase()
+        self.edit_entry = None
         self.build_page()
+        
         
     def build_page(self):
         
@@ -45,10 +47,10 @@ class ViewProducts:
         self.search_entry = tk.Entry(
                                 search_frame,
                                 width = 25,
-                                font=self.FONT
+                                font=("Segoe UI", 10)
                                 )
         
-        self.search_entry.pack(side = "left", padx =(0,10))
+        self.search_entry.pack(side = "left", padx =(5,10))
         
         search_button = tk.Button(
                                     search_frame,
@@ -130,11 +132,6 @@ class ViewProducts:
 
         tk.Button(
                     button_frame,
-                    text="Edit",
-                    width=15).pack(side="left", padx=5)
-
-        tk.Button(
-                    button_frame,
                     text="Delete",
                     width=15).pack(side="left", padx=5)
 
@@ -152,10 +149,12 @@ class ViewProducts:
 
         self.product_count.pack(pady=(0,10))
         
+
+        
         self.products_table.bind(
-                        "<Double-1>",
-                        self.view_product
-                        )
+                                "<Double-1>",
+                                self.edit_cell
+                                )
         
         self.category_combo.bind(
             "<<ComboboxSelected>>",
@@ -225,3 +224,107 @@ class ViewProducts:
         values = self.products_table.item(selected[0], "values")
 
         print(values)
+        
+    def edit_cell(self, event):
+        
+        #Remove any existing edit boxes
+        if self.edit_entry is not None:
+            self.edit_entry.destroy()
+            self.edit_entry = None
+        
+        row_id = self.products_table.identify_row(event.y)
+        column_id = self.products_table.identify_column(event.x)
+        
+        if not row_id or not column_id:
+            return
+        
+        #only Fruit, Price and Stock can be edited
+        editable_columns = {
+            "#1" : "Fruit",
+            "#2" : "Price",
+            "#4" : "Stock"
+        }
+        
+        if column_id not in editable_columns:
+            return
+        
+        column_name = editable_columns[column_id]
+        
+        values = self.products_table.item(row_id, "values")
+        column_index = int(column_id[1:]) - 1
+        current_value = values[column_index]
+        
+        #get the position and size of the cell
+        bbox = self.products_table.bbox(row_id, column_id)
+        
+        if not bbox:
+            return
+        
+        x, y, width, height = bbox
+        
+        #Create  an Entry over the cell
+        self.edit_entry = tk.Entry(
+                        self.products_table,
+                        font =  ("Segoe UI", 10)
+                        )
+        
+        self.edit_entry.place(
+                    x=x,
+                    y=y,
+                    width = width,
+                    height = height
+                    )
+        
+        self.edit_entry.insert(0, current_value)
+        self.edit_entry.select_range(0, tk.END)
+        self.edit_entry.focus()
+        
+        #Save when Enter is pressed
+        self.edit_entry.bind(
+            "<Return>",
+            lambda event: self.save_cell(
+                row_id,
+                column_name,
+                column_index
+            )
+        )
+        
+        #Cancel when Escape is pressed
+        self.edit_entry.bind(
+            "<Escape>",
+            lambda event: self.cancel_edit()
+        )
+        
+    def save_cell(self, row_id, column_name, column_index):
+
+        new_value = self.edit_entry.get().strip()
+
+        if not new_value:
+            print("Value cannot be empty.")
+            return
+
+        values = list(
+            self.products_table.item(row_id, "values")
+        )
+
+        product_id = values[2]
+
+        # Update database
+        self.db.update_product(
+            product_id,
+            column_name,
+            new_value
+        )
+
+        # Remove edit box
+        self.edit_entry.destroy()
+        self.edit_entry = None
+
+        # Reload table
+        self.load_products()
+        
+    def cancel_edit(self):
+
+        if self.edit_entry is not None:
+            self.edit_entry.destroy()
+            self.edit_entry = None

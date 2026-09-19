@@ -10,6 +10,7 @@ class AddProducts:
     ENTRY_WIDTH = 40
     BG_COLOR_BEIGE = "#e5c0b3"
     
+    
         
     def __init__(self, content_frame):
         self.content_frame = content_frame
@@ -89,6 +90,7 @@ class AddProducts:
 
         )
         
+        
         self.form_frame.pack(anchor = "nw", padx = 20, pady = 20)
         image_label.grid(row = 3, column = 0, sticky = "w", padx = 5, pady = 10)
         self.image_button.grid(row=3, column = 1, sticky = "w", pady = 10)
@@ -132,5 +134,4 @@ class AddProducts:
         if not self.image_path:
             messagebox.showerror("Error", "Please choose an image.")
             return
-
-        
+    

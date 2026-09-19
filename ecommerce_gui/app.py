@@ -3,6 +3,6 @@ from pages.login import LoginPage
 
 root = tk.Tk()
 
-app = LoginPage(root)
+app = LoginPage(root,)
 
 root.mainloop()
