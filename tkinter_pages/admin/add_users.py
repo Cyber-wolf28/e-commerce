@@ -74,10 +74,13 @@ class AddUsers:
         role = self.role_entry.get().strip()
         email = self.email_entry.get().strip()
         password = self.password_entry.get().strip()
+        
            
         if not all([name, surname, username, role, email, password]):
                     messagebox.showerror("Error", "Please complete all fields.")
-                    return   
+                    return
+                
+        hashed_password = AuthService.hash_password(password)
          
         success = self.db.add_user(
                                 name,
@@ -85,7 +88,7 @@ class AddUsers:
                                 username,
                                 role,
                                 email,
-                                password
+                                hashed_password
                                 )
         if success:
             self.name_entry.delete(0, tk.END)

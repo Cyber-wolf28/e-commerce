@@ -1,7 +1,7 @@
 import tkinter as tk    
 from backend.auth_service import AuthService
 from PIL import Image, ImageTk
-from pages.register import RegisterPage
+from tkinter_pages.register import RegisterPage
 from dashboards.admin_dashboard import AdminPage
 from tkinter import messagebox
 
@@ -61,7 +61,7 @@ class LoginPage:
         self.password_entry = tk.Entry(self.login_frame, width = self.ENTRY_WIDTH, show ="*")
 
         self.register_label = tk.Label(self.login_frame, 
-                            text = "Don't have an account?",
+                            text = "Forgot Password?",
                             relief = "flat",
                             borderwidth = 0,
                             highlightthickness = 0,

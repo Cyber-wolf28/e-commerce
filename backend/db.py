@@ -81,6 +81,79 @@ class DataBase:
                 cursor.close()
             if connection:
                 connection.close()
+                
+    def update_user(user_id, column_name, new_value):
+        
+        allowed_columns = {
+            "Name" : "name",
+            "Surname" : "surname",
+            "Username" : "username",
+            "Role" : "role",
+            "Email" : "email"
+        }
+        
+        if column_name not in allowed_columns:
+            return False
+        
+        database_column = allowed_columns[column_name]
+        
+        conn = DataBase.get_connection()
+        
+        try:
+            cursor = conn.cursor()
+            
+            query = f"""UPDATE users_admin 
+                        SET {database_column} = %s
+                        WHERE id = %s
+                        """
+                        
+            cursor.execute(
+                query,
+                (new_value, user_id)
+            )
+            
+            conn.commit()
+            
+            return True
+        
+        except Exception as error:
+            conn.rollback()
+            print(f"Database error: {error}")
+            return False
+        
+        finally:
+            cursor.close()
+            conn.close()
+            
+            
+    @staticmethod        
+    def get_all_users():
+        
+        connection = None
+        cursor = None
+        
+        try:
+            connection = DataBase.get_connection()
+            cursor = connection.cursor()
+            
+            cursor.execute(
+                """SELECT id, name, surname, username,role, email, date, time
+                from users_admin"""
+            )
+            
+            rows = cursor.fetchall()
+            return rows
+        
+        except Exception as e:
+            print(f"Error: {e}")
+            return []
+        
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+                
     
     @staticmethod     
     def add_product(fruit, price, stock, image_path):
@@ -179,3 +252,4 @@ class DataBase:
         finally:
             cursor.close()
             conn.close()
+            
